@@ -7,23 +7,28 @@ using std::endl;
 using std::string;
 
 string in;
+float out;
 
 int main() {
 	cout << "Enter: ";
 	while(!(cin >> in)) cout << "\nTry again: ";
 
-	//cout << "\n" << in.size() << "\n"; //TStool
-
-	for(int i(0); i < in.size(); i++) {
-		if(in[i] == '+' && i > 0 && i+1 < in.size()) {
-			cout << "\nAnswer: ";
-			cout << float(in[i-1])-48 + float(in[i+1])-48;
-			cout << endl;
-
-		} else if(in[i] == '-' && i > 0 && i+1 < in.size()) {
-			cout << "\nAnswer: ";
-			cout << float(in[i-1])-48 + float(in[i+1])-48;
-
+	out = float(in[0])-48;
+	for(int i(1); i < in.size(); i++) {
+		switch(in[i]) {
+			case '+' :
+				out += float(in[i+1])-48;
+				break;
+			case '-' :
+				out -= float(in[i+1])-48;
+				break;
+			case '*' :
+				out *= float(in[i+1])-48;
+				break;
+			case '/' :
+				out /= float(in[i+1])-48;
+				break;
 		};
 	};
+	cout << "Answer: " << out << endl;
 }
