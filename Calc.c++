@@ -8,11 +8,14 @@ using std::endl;
 #include<vector>
 using std::vector;
 
+#include"stdlib.h"
+using std::exit;
+
 // Function Declarations
 //------------------------------------------------------------------
 double prcsXprsn();
 double prcsTrm();
-double prcsPrmry(); 
+double prcsPrmry();
 
 // Class Definitions
 //------------------------------------------------------------------
@@ -41,7 +44,7 @@ TokenStream TknStrm;
 int main() {
 	try {
 		double vl = 0;
-		Tnk Tk;
+		Tkn Tk;
 		while(cin) {
 			Tk = TknStrm.gt();
 
@@ -51,16 +54,8 @@ int main() {
 
 			vl = prcsXprsn();
 		};
-		//keep_window_open();
-	/*
-	} catch() {
-		cout << "Error 1: " << '\n';
-		//keep_window_open();
-		return 1;
-	*/
 	} catch(...) {
 		cout << "Error!\n";
-		//keep_window_open();
 		return 2;
 	};
 }
@@ -75,7 +70,10 @@ TokenStream::TokenStream() {
 	fll = false;
 };
 void TokenStream::ptBck(Tkn Tk) {
-	if(fll) cout << "putback into full buffer\n";
+	if(fll) {
+		cout << "putback into full buffer\n";
+		exit(0);
+	};
 	bffr = Tk;
 	fll = true;
 };
@@ -140,7 +138,7 @@ double prcsTrm() {
 			Tk = TknStrm.gt();
 			break;
 		default:
-			Tk = TknStrm.gt();
+			TknStrm.ptBck(Tk);
 			return lft; 
 		};
 	};
@@ -157,6 +155,9 @@ double prcsPrmry() {
 	case '8' :
 		return Tk.vl;
 		break;
+	case 'q' :
+		TknStrm.ptBck(Tk);
+		return 0;
 	default:
 		cout << "primary expected\n";
 	};
