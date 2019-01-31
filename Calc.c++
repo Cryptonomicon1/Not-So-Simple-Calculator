@@ -10,12 +10,26 @@ using std::vector;
 
 #include"stdlib.h"
 using std::exit;
+using std::cerr;
+using std::runtime_error;
+
+#include<string>
+using std::string;
+
+// Global Constants
+//------------------------------------------------------------------
+static const char qt = 'q';
+static const char prnt = ';';
+static const char prmpt = '>';
+static const char rslt = '=';
 
 // Function Declarations
 //------------------------------------------------------------------
+void clcltVls();
 double prcsXprsn();
 double prcsTrm();
 double prcsPrmry();
+void psWndw(string);
 
 // Class Definitions
 //------------------------------------------------------------------
@@ -43,20 +57,13 @@ TokenStream TknStrm;
 //------------------------------------------------------------------
 int main() {
 	try {
-		double vl = 0;
-		Tkn Tk;
-		while(cin) {
-			Tk = TknStrm.gt();
-
-			if(Tk.knd == 'q') break;
-			if(Tk.knd == ';') cout << "=" << vl << '\n';
-			else TknStrm.ptBck(Tk);
-
-			vl = prcsXprsn();
-		};
+		clcltVls();
+	} catch(runtime_error& e) {
+		cerr << e.what() << '\n';
+		psWndw("~~");
 	} catch(...) {
-		cout << "Error!\n";
-		return 2;
+		cerr << "Exception\n";
+		psWndw("~~");
 	};
 }
 // Class Function Definitions
@@ -86,25 +93,52 @@ Tkn TokenStream::gt() {
 	cin >> chr;
 
 	switch(chr) {
-	case ';' :
-	case 'q' :
-	case '(' : case ')' : case '+' :
-	case '-' : case '*' : case '/' :
+	case prnt :
+	case qt :
+	case '(' :
+	case ')' :
+	case '+' :
+	case '-' :
+	case '*' :
+	case '/' :
+	case '%' :
 		return Tkn {chr, 0};
 	case '.' :
-	case '0' : case '1' : case '2' : case '3' : case '4' :
-	case '5' : case '6' : case '7' : case '8' : case '9' : {
+	case '0' :
+	case '1' :
+	case '2' :
+	case '3' :
+	case '4' :
+	case '5' :
+	case '6' :
+	case '7' :
+	case '8' :
+	case '9' : {
 		cin.putback(chr);
 		double vl;
 		cin >> vl;
-		return Tkn {'8', vl};
+		return Tkn {'#', vl};
 	};
 	default:
 		cout << "Bad Token\n";
+		psWndw("~~");
 	};
 };
 // Function Definitions
 //------------------------------------------------------------------
+
+void clcltVls() {
+	double vl = 0;
+	Tkn Tk;
+	while(cin) {
+		cout << prmpt;
+		Tk = TknStrm.gt();
+		while(Tk.knd==prnt) Tk=TknStrm.gt(); // eat ';'s
+		if(Tk.knd == qt) exit(0);
+		TknStrm.ptBck(Tk);
+		cout << rslt << prcsXprsn() << '\n';
+	};
+};
 double prcsXprsn() {
 	double lft = prcsTrm();
 	Tkn Tk = TknStrm.gt();
@@ -137,6 +171,17 @@ double prcsTrm() {
 			lft /= prcsPrmry();
 			Tk = TknStrm.gt();
 			break;
+		case '%' : {
+			int lfti = int(lft);
+			int rghti = int(prcsPrmry());
+			if(rghti == 0) {
+				cout << "Error with %: divide by zero\n";
+				psWndw("~~");
+			};
+			lft = lfti % rghti;
+			Tk = TknStrm.gt();
+			break;
+			}
 		default:
 			TknStrm.ptBck(Tk);
 			return lft; 
@@ -152,13 +197,22 @@ double prcsPrmry() {
 		if(Tk.knd !=')') cout << "')' expected\n";
 		return d;
 	} break;
-	case '8' :
+	case '#' :
 		return Tk.vl;
 		break;
-	case 'q' :
+	case qt :
 		TknStrm.ptBck(Tk);
 		return 0;
+	case '-' :
+		return - prcsPrmry();
+	case '+' :
+		return prcsPrmry();
 	default:
 		cout << "primary expected\n";
+		psWndw("~~");
 	};
+};
+void psWndw(string s) {
+	cout << "Please Enter " << s << " to exit program.\n";
+	for(string ch; cin >> ch;) if(ch == s) exit(0);
 };
