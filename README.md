@@ -1,0 +1,1 @@
+This is a program that calculates numbers. It also accepts variables.I followed along with the examples in the book, "Programming Principles and Practice Using C++ second edition" by Bjarne Stroustrup. In the second edition, there were many errors. I suspect they were intentional. However, they may have been cleaned up in later editions.
